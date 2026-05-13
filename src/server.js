@@ -1,22 +1,26 @@
+require('dotenv').config();
+
 const app = require('./app');
+
 const sequelize = require('./config/database');
 
-const PORT = 3000;
+const connectMongo = require('./config/mongo');
 
+const PORT = process.env.PORT || 3000;
 
 async function startServer() {
     try {
+        await sequelize.authenticate();
 
-        await sequelize.sync({ force: false });
-        console.log('Conexão com o banco estabelecida com sucesso.');
+        console.log('MySQL connected');
+
+        await connectMongo();
 
         app.listen(PORT, () => {
-            console.log(`Servidor rodando na porta ${PORT}`);
+            console.log(`Server running on port ${PORT}`);
         });
     } catch (error) {
-        console.error('Não foi possível conectar ao banco:', error);
-
-        setTimeout(startServer, 5000);
+        console.error(error);
     }
 }
 
